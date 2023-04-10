@@ -5,12 +5,22 @@ import addressRepository, { CreateAddressParams } from '@/repositories/address-r
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
 
-async function getAddressFromCEP() {
-  const result = await request.get(`${process.env.VIA_CEP_API}/37440000/json/`);
+async function getAddressFromCEP(cep?: string) {
+  const result = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
   if (!result.data) {
     throw notFoundError();
   }
+
+  const formatedResult = {
+    logradouro: result.data.logradouro,
+    complemento: result.data.complemento,
+    bairro: result.data.bairro,
+    cidade: result.data.localidade,
+    uf: result.data.uf,
+  };
+
+  return formatedResult;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
